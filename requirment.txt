@@ -1,4 +1,4 @@
-pdfplumber
+PyPDF2
 transformers
 torch
 streamlit
