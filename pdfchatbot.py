@@ -1,4 +1,4 @@
-import fitz  # PyMuPDF
+import pymupdf  # PyMuPDF provides `fitz` as part of `pymupdf`
 import streamlit as st
 from transformers import pipeline
 
@@ -8,7 +8,7 @@ qa_pipeline = pipeline("question-answering", model="distilbert-base-cased-distil
 # Function to extract text from PDF
 def extract_text_from_pdf(pdf_file_path):
     text = ""
-    with fitz.open(pdf_file_path) as pdf:
+    with pymupdf.open(pdf_file_path) as pdf:
         for page in pdf:
             text += page.get_text()
     return text
@@ -36,3 +36,4 @@ if uploaded_file and question:
     
     # Display the answer
     st.write("Answer:", result['answer'])
+
