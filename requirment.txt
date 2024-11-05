@@ -1,0 +1,4 @@
+pymupdf
+transformers
+torch
+streamlit
