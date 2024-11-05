@@ -1,34 +1,47 @@
-import fitz  # PyMuPDF
 import streamlit as st
 from transformers import pipeline
+from PyPDF2 import PdfReader
+import docx
 
-# Load a pre-trained question-answering model from Hugging Face
-qa_pipeline = pipeline("question-answering", model="distilbert-base-cased-distilled-squad", device=0)
+# Load the summarization model
+summarizer = pipeline("summarization")
 
 # Function to extract text from PDF
-def extract_text_from_pdf(pdf_file):
-    text = ""
-    with fitz.open(pdf_file) as pdf:
-        for page in pdf:
-            text += page.get_text()
+def extract_text_from_pdf(file):
+    reader = PdfReader(file)
+    text = ''
+    for page in reader.pages:
+        text += page.extract_text() + '\n'
+    return text
+
+# Function to extract text from DOCX
+def extract_text_from_docx(file):
+    doc = docx.Document(file)
+    text = ''
+    for paragraph in doc.paragraphs:
+        text += paragraph.text + '\n'
     return text
 
 # Streamlit UI
-st.title("PDF Query Chatbot")
-st.write("Upload a PDF and ask questions about its content.")
+st.title("Document Summarizer")
+st.write("Upload a document file (.pdf or .docx) to summarize its content.")
 
-# Upload PDF file
-uploaded_file = st.file_uploader("Upload PDF", type="pdf")
+uploaded_file = st.file_uploader("Choose a file", type=['pdf', 'docx'])
 
-# Enter question
-question = st.text_input("Enter your question:")
+if uploaded_file is not None:
+    if uploaded_file.type == "application/pdf":
+        text = extract_text_from_pdf(uploaded_file)
+    elif uploaded_file.type == "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+        text = extract_text_from_docx(uploaded_file)
+    else:
+        st.error("Unsupported file type!")
 
-if uploaded_file and question:
-    # Extract text from the uploaded PDF
-    pdf_text = extract_text_from_pdf(uploaded_file)
+    if text:
+        st.subheader("Original Text:")
+        st.write(text)
 
-    # Get answer using the Hugging Face model
-    result = qa_pipeline(question=question, context=pdf_text)
+        # Summarize the text
+        summary = summarizer(text, max_length=130, min_length=30, do_sample=False)
 
-    # Display the answer
-    st.write("Answer:", result['answer'])
+        st.subheader("Summary:")
+        st.write(summary[0]['summary_text'])
