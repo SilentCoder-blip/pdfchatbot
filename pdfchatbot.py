@@ -1,13 +1,16 @@
-from pdfminer.high_level import extract_text  # Using pdfminer for PDF text extraction
+import fitz  # PyMuPDF
 import streamlit as st
 from transformers import pipeline
 
 # Load a pre-trained question-answering model from Hugging Face
-qa_pipeline = pipeline("question-answering", model="distilbert-base-cased-distilled-squad")
+qa_pipeline = pipeline("question-answering", model="distilbert-base-cased-distilled-squad", device=0)
 
 # Function to extract text from PDF
 def extract_text_from_pdf(pdf_file):
-    text = extract_text(pdf_file)  # Use pdfminer to extract text
+    text = ""
+    with fitz.open(pdf_file) as pdf:
+        for page in pdf:
+            text += page.get_text()
     return text
 
 # Streamlit UI
@@ -23,9 +26,9 @@ question = st.text_input("Enter your question:")
 if uploaded_file and question:
     # Extract text from the uploaded PDF
     pdf_text = extract_text_from_pdf(uploaded_file)
-    
+
     # Get answer using the Hugging Face model
     result = qa_pipeline(question=question, context=pdf_text)
-    
+
     # Display the answer
     st.write("Answer:", result['answer'])
