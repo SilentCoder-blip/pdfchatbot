@@ -1,4 +1,4 @@
-PyPDF2
+pdfminer.six
 transformers
 torch
 streamlit
