@@ -1,16 +1,16 @@
-import pdfplumber  # Using pdfplumber for PDF text extraction
+import PyPDF2  # Using PyPDF2 for PDF text extraction
 import streamlit as st
 from transformers import pipeline
 
 # Load a pre-trained question-answering model from Hugging Face
-qa_pipeline = pipeline("question-answering", model="google/tapas-large-finetuned-wtq")
+qa_pipeline = pipeline("question-answering", model="distilbert-base-cased-distilled-squad")
 
 # Function to extract text from PDF
 def extract_text_from_pdf(pdf_file):
     text = ""
-    with pdfplumber.open(pdf_file) as pdf:
-        for page in pdf.pages:
-            text += page.extract_text() or ""  # Handle pages without text
+    reader = PyPDF2.PdfReader(pdf_file)
+    for page in reader.pages:
+        text += page.extract_text() or ""  # Handle pages without text
     return text
 
 # Streamlit UI
@@ -32,4 +32,3 @@ if uploaded_file and question:
     
     # Display the answer
     st.write("Answer:", result['answer'])
-
