@@ -1,0 +1,7 @@
+pip install streamlit python-docx PyPDF2 transformers
+streamlit run app.py
+git init
+git add app.py
+git commit -m "Initial commit"
+git remote add origin <your-repo-url>
+git push -u origin master
