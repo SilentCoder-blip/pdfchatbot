@@ -1,4 +1,4 @@
-import PyPDF2  # Using PyPDF2 for PDF text extraction
+from pdfminer.high_level import extract_text  # Using pdfminer for PDF text extraction
 import streamlit as st
 from transformers import pipeline
 
@@ -7,10 +7,7 @@ qa_pipeline = pipeline("question-answering", model="distilbert-base-cased-distil
 
 # Function to extract text from PDF
 def extract_text_from_pdf(pdf_file):
-    text = ""
-    reader = PyPDF2.PdfReader(pdf_file)
-    for page in reader.pages:
-        text += page.extract_text() or ""  # Handle pages without text
+    text = extract_text(pdf_file)  # Use pdfminer to extract text
     return text
 
 # Streamlit UI
